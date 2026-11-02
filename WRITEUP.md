@@ -2,63 +2,34 @@
 
 ## Architecture decisions and why
 
-**Flow:** ticket → LLM tool-calling loop (OpenAI Responses API) → strict structured `TriageDecision` →
-deterministic **policy layer** → `TriageResult` with a full trace.
+**Flow:** ticket → LLM tool-calling loop (OpenAI Responses API) → strict `TriageDecision` → policy layer → `TriageResult` + trace.
 
-- **Own agent loop instead of a framework.** The loop is about 40 lines. Every step can be seen, tested and capped
-  (`MAX_TOOL_ITERATIONS`; on the last turn tool calls are disabled so the model must decide). The LLM sits behind
-  a small `LLMClient` protocol: the tests use a scripted fake, and `OPENAI_BASE_URL` points it at any
-  OpenAI-compatible server.
-- **Structured output, not text parsing.** `TriageDecision` is a Pydantic model sent as a strict JSON schema,
-  with enums for urgency, action, team and sentiment. The output is always valid and typed.
-- **LLM for judgement, code for hard rules.** The model reads the whole thread (tone changes, deadlines,
-  Thai text) and writes the reply. Business-critical rules are enforced in `policy.py` after the model:
-  duplicate charges or a dispute threat go to billing, an Enterprise or confirmed outage goes to SRE, security
-  goes to the security team, hallucinated KB citations are removed, and auto-respond requires a grounded,
-  confident, low-risk answer. Rules can only **raise** urgency or escalate, and each override is recorded
-  with its reason.
-- **Tools give facts the text cannot.** Billing shows the 3 pending authorizations and the failed provisioning
-  webhook. Internal status shows an Asia incident that the public status page does not show yet. Tool schemas
-  are generated from Pydantic models, so adding a tool means writing one class.
-- **Multilingual.** KB queries are written in English, and the reply uses the customer's language.
-- **Traceability.** Every result records the model, the prompt version (a content hash), the tool calls, tokens
-  and latency.
+- **Own agent loop, no framework.** Small, testable, capped by `MAX_TOOL_ITERATIONS`. The LLM sits behind a protocol, so tests use a fake model and `OPENAI_BASE_URL` can point at any OpenAI-compatible server.
+- **Strict structured output.** The decision is a Pydantic schema with enums, so the result is always valid and typed.
+- **LLM for judgement, code for hard rules.** The model reads the thread and drafts the reply. `policy.py` then enforces billing, outage and security escalation, removes made-up KB citations, and blocks unsafe auto-replies. Rules can only raise urgency, and every change is logged with its reason.
+- **Tools supply facts the text can't.** Duplicate charges, an Asia incident not yet on the status page. A tool is one class whose schema is generated from Pydantic.
+- **Multilingual and traceable.** KB queries go in English and replies in the customer's language. Each result records the model, prompt version, tool calls and tokens.
 
 ## What could go wrong and how I'd handle it
 
 | Risk | Mitigation |
 |---|---|
-| Under-triage of a serious issue | Policy floor rules; the prompt says over-triage is cheaper; under-triage tracked as its own eval metric |
-| Hallucinated answers or policies | Reply grounded in tool/KB output; citations checked against retrieved IDs; no auto-respond without a grounded article |
-| Prompt injection in ticket text | Ticket wrapped in `<ticket>` and declared as data; tools are read-only; policy runs after the LLM; injection case in the eval set |
-| Promising refunds or ETAs | Prompt rule; an auto-reply containing a refund, guarantee or deadline commitment is sent to a human instead |
-| Context collision (an unrelated incident in the same region "explains" a vague ticket) | Found by the eval. Fixed by linking incidents only when the symptoms match, and by forcing escalation only for major incidents |
-| Model skips investigation | Required tools (customer history, KB): if the model decides early, it is sent back to call them |
-| LLM/API outage, rate limits, bad JSON | SDK retries with backoff; tool errors returned to the model as data; on failure → **fail-safe escalation to a human** |
-| Tool returns stale or missing data | `found: false` is handled explicitly; confidence drops; the policy blocks auto-respond |
-| Cost and latency | Iteration cap; tokens tracked per ticket; production: a small model for clear low-risk tickets and a large one for the rest |
-| PII in logs and prompts | Production: redact card and contact data before logging; data retention settings |
+| Under-triage | Policy floor rules; under-triage tracked as its own metric |
+| Hallucination | Replies grounded in tools/KB; citations checked against search results |
+| Prompt injection | Ticket wrapped as data; read-only tools; policy runs after the LLM |
+| Promises (refunds, dates) | Auto-replies with commitments go to a human |
+| Context collision | Link an incident only when symptoms match; force escalation only for major incidents |
+| Skipped investigation | Required tools; the model is sent back if it decides early |
+| LLM/API failure | Retries, then fail-safe escalation to a human |
+| Cost and PII | Iteration cap, token tracking; redact PII in production |
 
-**Current results (gpt-4.1):** 13/13 golden cases pass, with 0 under-triaged. Repeated 3 times, the critical and
-vague cases gave the same labels every run. In a red-team run, the model was instructed to answer low urgency,
-auto-respond, cite a fake KB article and promise a refund. The policy layer still escalated the billing, outage and
-security tickets, removed the fake citation, and stopped the promising auto-replies.
+**Results (gpt-4.1):** 13/13 golden cases pass, 0 under-triaged, stable across 3 runs. A red-team run that told the model to under-triage and promise refunds was corrected by the policy layer.
 
 ## How I'd evaluate it in production
 
-1. **Before launch (offline):** run `triage eval` on a golden set built from real historical tickets labelled by
-   senior agents. Metrics: urgency accuracy, **under-triage rate** (the gating metric), action and route accuracy,
-   tool recall, schema validity, consistency over repeated runs, cost and latency. It runs in CI on every prompt
-   or model change and fails the build on regressions.
-2. **Shadow mode:** the agent triages live tickets, but humans still decide. Measure agreement with the human
-   decision per urgency and per team, and review every disagreement where the agent's urgency was lower.
-3. **Gradual rollout:** enable routing first, then auto-respond for low-risk categories only. Track reopen rate,
-   CSAT after auto-replies, time-to-first-response, escalation precision (how many escalations were needed), and
-   how often humans override the agent.
-4. **Reply quality:** sample replies weekly and score them with an LLM judge (groundedness, covers every
-   question, tone, correct language, no promises) checked against human review.
-5. **Continuous improvement:** add every misclassification to the golden set, and alert on drift (shifts in the
-   category mix, confidence or override rate).
+1. **Offline:** golden set from real tickets labelled by senior agents. Gate CI on under-triage rate, plus urgency, action and route accuracy.
+2. **Shadow mode:** agent decides, humans act. Measure agreement and review every case where the agent's urgency was lower.
+3. **Gradual rollout:** routing first, then auto-respond for low-risk categories. Track reopen rate, CSAT, override rate and time to first response.
+4. **Continuous:** LLM-judge reply quality checked against human review; add every miss to the golden set; alert on drift.
 
-**Next steps beyond this homework:** hybrid retrieval (vector + BM25) over the real help center, async queue
-ingestion, a CI eval gate, and deployment on Cloud Run.
+**Next steps:** hybrid vector + BM25 retrieval, async queue, CI eval gate, Cloud Run deployment.
