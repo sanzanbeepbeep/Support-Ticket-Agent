@@ -22,6 +22,8 @@ class Settings(BaseSettings):
 
     max_tool_iterations: int = 6
     auto_respond_min_confidence: float = 0.6
+    # The agent may not finish without calling these (it is sent back to investigate).
+    required_tools: tuple[str, ...] = ("get_customer_history", "search_knowledge_base")
 
     data_dir: Path = PROJECT_ROOT / "data"
 

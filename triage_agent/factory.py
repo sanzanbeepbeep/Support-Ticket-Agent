@@ -35,4 +35,5 @@ def build_agent(settings: Settings | None = None, llm: LLMClient | None = None) 
         policy=default_policy(settings.auto_respond_min_confidence),
         system_prompt=load_prompt("system_prompt"),
         max_iterations=settings.max_tool_iterations,
+        required_tools=settings.required_tools,
     )

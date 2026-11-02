@@ -23,6 +23,14 @@ from triage_agent.models import (
 )
 
 _DISPUTE_PATTERN = re.compile(r"\b(disput\w*|charge ?backs?|lawyers?|legal action|sue)\b", re.IGNORECASE)
+# Commitments only a human may make: refunds, credits, guarantees, deadlines. English-only heuristic.
+_COMMITMENT_PATTERN = re.compile(
+    r"\b(refund (has been|was|will be) (issued|processed|approved)|you will (receive|get) (a |your )?(full )?refund"
+    r"|(we|i) (have )?(approved|issued|processed) (a |your )?(full )?refund|credit (has been|will be) applied"
+    r"|guarantee[ds]?|by (today|tonight|tomorrow|monday|tuesday|wednesday|thursday|friday|end of (the )?day)"
+    r"|within \d+ (minutes?|hours?|days?))\b",
+    re.IGNORECASE,
+)
 
 
 @dataclass(frozen=True)
@@ -77,14 +85,23 @@ class FinancialRiskRule(Rule):
 
 
 class OutageRule(Rule):
-    """Confirmed incidents, or any Enterprise outage, go straight to SRE."""
+    """A major incident, or any Enterprise outage, goes straight to SRE.
+
+    Minor incidents are left to the model's judgement: forcing escalation for every open incident in a region
+    over-escalates unrelated tickets from that region.
+    """
 
     name = "outage"
+    blocking_severities = frozenset({"major", "critical"})
 
     def evaluate(self, decision: TriageDecision, context: PolicyContext) -> list[Change]:
         if IssueType.OUTAGE not in decision.issue_types:
             return []
-        incident_confirmed = any(out.get("active_incidents") for out in context.outputs_of("check_service_status"))
+        incident_confirmed = any(
+            incident.get("severity") in self.blocking_severities
+            for out in context.outputs_of("check_service_status")
+            for incident in out.get("active_incidents", [])
+        )
         is_enterprise = context.ticket.customer.plan == Plan.ENTERPRISE
         if not (incident_confirmed or is_enterprise):
             return []
@@ -118,7 +135,7 @@ class GroundingRule(Rule):
 
 
 class AutoRespondGuardRule(Rule):
-    """Only answer automatically when the answer is grounded, low-risk and the model is confident."""
+    """Only answer automatically when the answer is grounded, low-risk, confident and makes no promises."""
 
     name = "auto_respond_guard"
 
@@ -135,6 +152,8 @@ class AutoRespondGuardRule(Rule):
             problems.append("no grounded knowledge-base article")
         if decision.urgency.rank >= Urgency.HIGH.rank:
             problems.append(f"urgency is {decision.urgency}")
+        if commitment := _COMMITMENT_PATTERN.search(decision.customer_reply):
+            problems.append(f"reply makes a commitment a human must approve: '{commitment.group(0)}'")
         if not problems:
             return []
         reason = "; ".join(problems)

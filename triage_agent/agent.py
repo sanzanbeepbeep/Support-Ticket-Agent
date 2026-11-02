@@ -31,14 +31,19 @@ class TriageAgent:
         policy: PolicyEngine,
         system_prompt: Prompt,
         max_iterations: int = 6,
+        required_tools: tuple[str, ...] = (),
     ) -> None:
         if max_iterations < 1:
             raise ValueError("max_iterations must be at least 1")
+        unknown = set(required_tools) - set(tools.names)
+        if unknown:
+            raise ValueError(f"Required tools are not registered: {unknown}")
         self._llm = llm
         self._tools = tools
         self._policy = policy
         self._prompt = system_prompt
         self._max_iterations = max_iterations
+        self._required_tools = required_tools
 
     def triage(self, ticket: Ticket) -> TriageResult:
         started = time.perf_counter()
@@ -82,6 +87,11 @@ class TriageAgent:
             if not response.tool_calls:
                 if response.parsed is None:
                     raise LLMError("Model returned no tool calls and no decision.")
+                missing = [name for name in self._required_tools if name not in trace.tool_names()]
+                if missing and not is_last:
+                    # The model skipped mandatory investigation: send it back once more instead of trusting it.
+                    conversation.append(f"Your investigation is incomplete. Call {', '.join(missing)} before deciding.")
+                    continue
                 return response.parsed
 
             for call in response.tool_calls:

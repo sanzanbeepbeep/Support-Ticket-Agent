@@ -1,9 +1,12 @@
 import json
 
+import pytest
+
+from triage_agent.factory import build_agent
 from triage_agent.llm import LLMError, LLMResponse, ToolCall, ToolOutput
 from triage_agent.models import NextAction, Team, Urgency
 
-from tests.conftest import make_decision, tool_call
+from tests.conftest import FakeLLM, make_decision, tool_call
 
 
 def test_agent_runs_tools_then_returns_decision(make_agent, billing_ticket):
@@ -62,6 +65,31 @@ def test_llm_failure_falls_back_to_human_escalation(make_agent, billing_ticket):
     assert result.decision.confidence == 0.0
     # Policy still runs on the fallback: the dispute threat in the text routes it to billing.
     assert result.decision.route_to == Team.BILLING
+
+
+def test_agent_is_sent_back_when_required_tools_were_skipped(settings, dark_mode_ticket):
+    llm = FakeLLM([
+        LLMResponse(parsed=make_decision()),  # decides without investigating
+        LLMResponse(tool_calls=[
+            tool_call("get_customer_history", '{"customer_id": "C-3003"}', "c1"),
+            tool_call("search_knowledge_base", '{"query": "dark mode"}', "c2"),
+        ]),
+        LLMResponse(parsed=make_decision(kb_article_ids=["KB-004"])),
+    ])
+    strict_settings = settings.model_copy(update={"required_tools": ("get_customer_history", "search_knowledge_base")})
+
+    result = build_agent(strict_settings, llm=llm).triage(dark_mode_ticket)
+
+    reminder = llm.requests[1]["conversation"][-1]
+    assert isinstance(reminder, str) and "get_customer_history, search_knowledge_base" in reminder
+    assert result.trace.tool_names() == {"get_customer_history", "search_knowledge_base"}
+    assert result.decision.kb_article_ids == ["KB-004"]
+    assert not result.used_fallback
+
+
+def test_unknown_required_tool_is_rejected_at_startup(settings):
+    with pytest.raises(ValueError, match="not registered"):
+        build_agent(settings.model_copy(update={"required_tools": ("send_email",)}), llm=FakeLLM([]))
 
 
 def test_bad_tool_arguments_are_reported_to_model_not_raised(make_agent, dark_mode_ticket):

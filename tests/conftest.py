@@ -62,7 +62,7 @@ class FakeLLM:
 
 @pytest.fixture
 def settings() -> Settings:
-    return Settings(openai_api_key=None, data_dir=PROJECT_ROOT / "data", max_tool_iterations=4)
+    return Settings(openai_api_key=None, data_dir=PROJECT_ROOT / "data", max_tool_iterations=4, required_tools=())
 
 
 @pytest.fixture
