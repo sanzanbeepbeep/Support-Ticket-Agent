@@ -1,0 +1,22 @@
+[
+  {
+    "id": "INC-4821",
+    "region": "asia",
+    "component": "api-gateway (ap-southeast-1)",
+    "status": "investigating",
+    "severity": "major",
+    "started_minutes_ago": 130,
+    "summary": "Elevated HTTP 500 errors for tenants hosted in ap-southeast-1 after a config rollout.",
+    "published_on_status_page": false
+  },
+  {
+    "id": "INC-4790",
+    "region": "europe",
+    "component": "email notifications",
+    "status": "resolved",
+    "severity": "minor",
+    "started_minutes_ago": 4320,
+    "summary": "Delayed notification emails.",
+    "published_on_status_page": true
+  }
+]

@@ -1,0 +1,7 @@
+{
+  "ticket_id": "E-03",
+  "customer": {"customer_id": "C-4003", "name": "Chris Doe", "plan": "free", "region": "north_america", "tenure_months": 2},
+  "messages": [
+    {"minutes_ago": 3, "text": "THIS IS THE WORST DESIGNED APP I HAVE EVER USED!!! WHERE IS THE LOG OUT BUTTON??? I HAVE BEEN LOOKING FOR 10 MINUTES!!!"}
+  ]
+}

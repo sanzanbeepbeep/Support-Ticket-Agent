@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "triage-agent"
+version = "0.1.0"
+description = "AI agent that triages customer support tickets using OpenAI function calling."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "openai>=1.66",
+    "pydantic>=2.7",
+    "pydantic-settings>=2.3",
+    "fastapi>=0.110",
+    "uvicorn>=0.29",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "httpx>=0.27"]
+
+[project.scripts]
+triage = "triage_agent.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["triage_agent*"]
+
+[tool.setuptools.package-data]
+triage_agent = ["prompts/*.md"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

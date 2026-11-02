@@ -1,0 +1,22 @@
+{
+  "C-1001": {
+    "subscription": {"plan": "free", "pending_upgrade": "pro_monthly", "upgrade_status": "failed: provisioning webhook timeout"},
+    "transactions": [
+      {"id": "tx_9f1", "minutes_ago": 182, "amount": 29.99, "currency": "USD", "description": "Pro monthly upgrade", "card_last4": "4242", "status": "pending"},
+      {"id": "tx_9f7", "minutes_ago": 121, "amount": 29.99, "currency": "USD", "description": "Pro monthly upgrade", "card_last4": "1881", "status": "pending"},
+      {"id": "tx_a02", "minutes_ago": 75, "amount": 29.99, "currency": "USD", "description": "Pro monthly upgrade", "card_last4": "1881", "status": "pending"}
+    ]
+  },
+  "C-2002": {
+    "subscription": {"plan": "enterprise", "billing_cycle": "annual", "status": "paid"},
+    "transactions": [
+      {"id": "inv_2026_03", "minutes_ago": 345600, "amount": 54000, "currency": "USD", "description": "Enterprise annual, 45 seats", "card_last4": null, "status": "captured"}
+    ]
+  },
+  "C-3003": {
+    "subscription": {"plan": "pro", "billing_cycle": "monthly", "status": "paid"},
+    "transactions": [
+      {"id": "tx_77c", "minutes_ago": 20160, "amount": 29.99, "currency": "USD", "description": "Pro monthly", "card_last4": "5555", "status": "captured"}
+    ]
+  }
+}

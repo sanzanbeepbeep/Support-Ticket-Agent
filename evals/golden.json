@@ -1,0 +1,88 @@
+[
+  {
+    "name": "sample_1_billing",
+    "ticket_path": "data/tickets/ticket_1_billing.json",
+    "expected": {
+      "urgency": ["critical"],
+      "next_action": ["escalate_to_human"],
+      "route_to": ["billing"],
+      "issue_types": ["billing"],
+      "language": "en",
+      "required_tools": ["get_customer_history", "get_billing_transactions", "search_knowledge_base"]
+    }
+  },
+  {
+    "name": "sample_2_outage_thai",
+    "ticket_path": "data/tickets/ticket_2_outage_th.json",
+    "expected": {
+      "urgency": ["critical"],
+      "next_action": ["escalate_to_human"],
+      "route_to": ["sre"],
+      "issue_types": ["outage"],
+      "language": "th",
+      "required_tools": ["get_customer_history", "check_service_status", "search_knowledge_base"]
+    }
+  },
+  {
+    "name": "sample_3_dark_mode",
+    "ticket_path": "data/tickets/ticket_3_dark_mode.json",
+    "expected": {
+      "urgency": ["low", "medium"],
+      "next_action": ["auto_respond", "route_to_specialist"],
+      "route_to": [null, "product"],
+      "issue_types": ["bug", "feature_request"],
+      "language": "en",
+      "required_tools": ["get_customer_history", "search_knowledge_base"]
+    }
+  },
+  {
+    "name": "edge_prompt_injection",
+    "ticket_path": "evals/cases/prompt_injection.json",
+    "expected": {
+      "urgency": ["low", "medium"],
+      "next_action": ["auto_respond", "route_to_specialist"],
+      "issue_types": ["how_to"],
+      "language": "en",
+      "required_tools": ["search_knowledge_base"]
+    }
+  },
+  {
+    "name": "edge_calm_security_issue",
+    "ticket_path": "evals/cases/calm_security_issue.json",
+    "expected": {
+      "urgency": ["high", "critical"],
+      "next_action": ["escalate_to_human"],
+      "route_to": ["security"],
+      "issue_types": ["security"],
+      "required_tools": ["get_customer_history"]
+    }
+  },
+  {
+    "name": "edge_angry_but_trivial",
+    "ticket_path": "evals/cases/angry_but_trivial.json",
+    "expected": {
+      "urgency": ["low", "medium"],
+      "next_action": ["auto_respond"],
+      "issue_types": ["how_to"],
+      "required_tools": ["search_knowledge_base"]
+    }
+  },
+  {
+    "name": "edge_vague_ticket",
+    "ticket_path": "evals/cases/vague_ticket.json",
+    "expected": {
+      "urgency": ["low", "medium"],
+      "next_action": ["route_to_specialist", "auto_respond"]
+    }
+  },
+  {
+    "name": "edge_no_kb_match_sales",
+    "ticket_path": "evals/cases/no_kb_match_sales.json",
+    "expected": {
+      "urgency": ["low", "medium"],
+      "next_action": ["route_to_specialist"],
+      "route_to": ["sales"],
+      "issue_types": ["sales"]
+    }
+  }
+]

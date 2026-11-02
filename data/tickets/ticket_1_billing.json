@@ -1,0 +1,18 @@
+{
+  "ticket_id": "T-1001",
+  "customer": {
+    "customer_id": "C-1001",
+    "name": "Alex Morgan",
+    "plan": "free",
+    "region": "north_america",
+    "tenure_months": 4,
+    "seats": 1,
+    "notes": "Free plan, upgrade to Pro attempted. 4 months on free tier. First time contacting support."
+  },
+  "messages": [
+    {"minutes_ago": 180, "text": "My payment failed when I tried to upgrade to Pro. Can you check what's wrong?"},
+    {"minutes_ago": 120, "text": "I tried again with a different card. Now I see TWO pending charges but my account still shows Free plan??"},
+    {"minutes_ago": 60, "text": "Okay this is getting ridiculous. Just checked my bank app - I have THREE charges of $29.99 now. None of them refunded. And I STILL don't have Pro access."},
+    {"minutes_ago": 0, "text": "HELLO?? Is anyone there??? I need this fixed NOW. I have a presentation in 2 hours and I need the Pro export features. If these charges aren't reversed by end of day I'm disputing all of them with my bank."}
+  ]
+}

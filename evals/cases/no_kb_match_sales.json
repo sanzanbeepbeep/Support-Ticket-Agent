@@ -1,0 +1,7 @@
+{
+  "ticket_id": "E-05",
+  "customer": {"customer_id": "C-4005", "name": "Global Retail Inc.", "plan": "pro", "region": "north_america", "tenure_months": 9, "seats": 12},
+  "messages": [
+    {"minutes_ago": 60, "text": "We're growing to about 500 users next quarter. Do you offer an on-premise deployment with SAML SSO through Okta? Who should we talk to about pricing?"}
+  ]
+}

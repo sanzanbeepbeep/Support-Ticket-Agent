@@ -1,0 +1,7 @@
+{
+  "ticket_id": "E-02",
+  "customer": {"customer_id": "C-4002", "name": "Daniel Kim", "plan": "pro", "region": "north_america", "tenure_months": 22},
+  "messages": [
+    {"minutes_ago": 10, "text": "Hi there, probably nothing, but I got an email saying my password was changed and I didn't do that. I also noticed a new API key called sync-prod-2 that I don't recognise. No rush, just thought I'd mention it. Thanks!"}
+  ]
+}

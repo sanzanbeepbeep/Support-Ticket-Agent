@@ -1,0 +1,7 @@
+{
+  "ticket_id": "E-04",
+  "customer": {"customer_id": "C-4004", "name": "Sam Taylor", "plan": "free", "region": "europe", "tenure_months": 1},
+  "messages": [
+    {"minutes_ago": 30, "text": "it doesnt work"}
+  ]
+}

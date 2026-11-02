@@ -1,0 +1,18 @@
+{
+  "ticket_id": "T-1002",
+  "customer": {
+    "customer_id": "C-2002",
+    "name": "Somchai (Siam Logistics Co.)",
+    "plan": "enterprise",
+    "region": "asia",
+    "tenure_months": 8,
+    "seats": 45,
+    "notes": "Enterprise plan, Thailand. First critical issue."
+  },
+  "messages": [
+    {"minutes_ago": 120, "text": "ระบบเข้าไม่ได้ครับ ขึ้น error 500"},
+    {"minutes_ago": 90, "text": "ลองหลายเครื่องแล้ว ทั้ง Chrome, Safari, Firefox ผลเหมือนกันหมด เพื่อนร่วมงานก็เข้าไม่ได้เหมือนกัน"},
+    {"minutes_ago": 45, "text": "ตอนนี้ลูกค้าโวยเข้ามาเยอะมาก เรามี demo กับลูกค้ารายใหญ่บ่ายนี้ ถ้าระบบไม่กลับมา deal นี้อาจจะหลุด"},
+    {"minutes_ago": 0, "text": "เช็ค status.company.com แล้ว บอกว่า all systems operational แต่เราใช้งานไม่ได้จริงๆ ช่วยเช็คให้หน่อยได้ไหมครับ region Asia มีปัญหาหรือเปล่า?"}
+  ]
+}

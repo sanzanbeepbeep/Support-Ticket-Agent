@@ -1,0 +1,59 @@
+{
+  "C-1001": {
+    "name": "Alex Morgan",
+    "plan": "free",
+    "account_status": "active",
+    "region": "north_america",
+    "previous_tickets": [],
+    "recent_events": [
+      {"minutes_ago": 182, "event": "upgrade_attempt", "detail": "Pro monthly, card ending 4242, payment provider timeout"},
+      {"minutes_ago": 121, "event": "upgrade_attempt", "detail": "Pro monthly, card ending 1881, payment provider timeout"},
+      {"minutes_ago": 75, "event": "upgrade_attempt", "detail": "Pro monthly, card ending 1881, payment provider timeout"}
+    ],
+    "usage": {"last_login_minutes_ago": 2, "projects": 7}
+  },
+  "C-2002": {
+    "name": "Siam Logistics Co.",
+    "plan": "enterprise",
+    "account_status": "active",
+    "region": "asia",
+    "data_center": "ap-southeast-1 (Singapore)",
+    "seats": 45,
+    "contract": {"annual_value_usd": 54000, "renewal_in_days": 120, "sla": "P1: 1 hour first response, 4 hour resolution target"},
+    "customer_success_manager": "Nattaya P.",
+    "previous_tickets": [
+      {"id": "T-0412", "subject": "SSO configuration question", "urgency": "low", "resolved": true},
+      {"id": "T-0587", "subject": "Invoice address change", "urgency": "low", "resolved": true}
+    ],
+    "recent_events": [
+      {"minutes_ago": 125, "event": "login_failures_spike", "detail": "41 of 45 users received HTTP 500 since 125 min ago"}
+    ]
+  },
+  "C-3003": {
+    "name": "Jamie Lee",
+    "plan": "pro",
+    "account_status": "active",
+    "region": "europe",
+    "previous_tickets": [],
+    "clients": [
+      {"type": "desktop_app", "os": "macOS 15.2", "app_version": "3.1.4"},
+      {"type": "web", "browser": "Safari"}
+    ],
+    "usage": {"daily_active": true, "last_login_minutes_ago": 30}
+  },
+  "C-4001": {"name": "Priya Shah", "plan": "pro", "account_status": "active", "region": "europe", "previous_tickets": []},
+  "C-4002": {
+    "name": "Daniel Kim",
+    "plan": "pro",
+    "account_status": "active",
+    "region": "north_america",
+    "previous_tickets": [],
+    "recent_events": [
+      {"minutes_ago": 50, "event": "password_changed", "detail": "from a new device, IP geolocated to another country"},
+      {"minutes_ago": 40, "event": "api_key_created", "detail": "key 'sync-prod-2' created from the same new device"}
+    ]
+  },
+  "C-4003": {"name": "Chris Doe", "plan": "free", "account_status": "active", "region": "north_america", "previous_tickets": []},
+  "C-4004": {"name": "Sam Taylor", "plan": "free", "account_status": "active", "region": "europe", "previous_tickets": []},
+  "C-4005": {"name": "Global Retail Inc.", "plan": "pro", "account_status": "active", "region": "north_america", "seats": 12, "previous_tickets": []}
+}
