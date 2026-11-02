@@ -1,0 +1,99 @@
+{
+  "$defs": {
+    "CustomerInfo": {
+      "properties": {
+        "customer_id": {
+          "title": "Customer Id",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "plan": {
+          "$ref": "#/$defs/Plan"
+        },
+        "region": {
+          "title": "Region",
+          "type": "string"
+        },
+        "tenure_months": {
+          "title": "Tenure Months",
+          "type": "integer"
+        },
+        "seats": {
+          "default": 1,
+          "title": "Seats",
+          "type": "integer"
+        },
+        "notes": {
+          "default": "",
+          "title": "Notes",
+          "type": "string"
+        }
+      },
+      "required": [
+        "customer_id",
+        "name",
+        "plan",
+        "region",
+        "tenure_months"
+      ],
+      "title": "CustomerInfo",
+      "type": "object"
+    },
+    "Message": {
+      "properties": {
+        "minutes_ago": {
+          "description": "How long ago the message was sent.",
+          "minimum": 0,
+          "title": "Minutes Ago",
+          "type": "integer"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "minutes_ago",
+        "text"
+      ],
+      "title": "Message",
+      "type": "object"
+    },
+    "Plan": {
+      "enum": [
+        "free",
+        "pro",
+        "enterprise"
+      ],
+      "title": "Plan",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "ticket_id": {
+      "title": "Ticket Id",
+      "type": "string"
+    },
+    "customer": {
+      "$ref": "#/$defs/CustomerInfo"
+    },
+    "messages": {
+      "items": {
+        "$ref": "#/$defs/Message"
+      },
+      "minItems": 1,
+      "title": "Messages",
+      "type": "array"
+    }
+  },
+  "required": [
+    "ticket_id",
+    "customer",
+    "messages"
+  ],
+  "title": "Ticket",
+  "type": "object"
+}

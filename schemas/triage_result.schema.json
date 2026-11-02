@@ -1,0 +1,332 @@
+{
+  "$defs": {
+    "AgentTrace": {
+      "properties": {
+        "model": {
+          "title": "Model",
+          "type": "string"
+        },
+        "prompt_version": {
+          "title": "Prompt Version",
+          "type": "string"
+        },
+        "iterations": {
+          "default": 0,
+          "title": "Iterations",
+          "type": "integer"
+        },
+        "input_tokens": {
+          "default": 0,
+          "title": "Input Tokens",
+          "type": "integer"
+        },
+        "output_tokens": {
+          "default": 0,
+          "title": "Output Tokens",
+          "type": "integer"
+        },
+        "latency_ms": {
+          "default": 0.0,
+          "title": "Latency Ms",
+          "type": "number"
+        },
+        "tool_calls": {
+          "items": {
+            "$ref": "#/$defs/ToolCallRecord"
+          },
+          "title": "Tool Calls",
+          "type": "array"
+        }
+      },
+      "required": [
+        "model",
+        "prompt_version"
+      ],
+      "title": "AgentTrace",
+      "type": "object"
+    },
+    "IssueType": {
+      "enum": [
+        "billing",
+        "outage",
+        "bug",
+        "how_to",
+        "feature_request",
+        "account",
+        "security",
+        "sales",
+        "other"
+      ],
+      "title": "IssueType",
+      "type": "string"
+    },
+    "NextAction": {
+      "enum": [
+        "auto_respond",
+        "route_to_specialist",
+        "escalate_to_human"
+      ],
+      "title": "NextAction",
+      "type": "string"
+    },
+    "PolicyOverride": {
+      "properties": {
+        "rule": {
+          "title": "Rule",
+          "type": "string"
+        },
+        "field": {
+          "title": "Field",
+          "type": "string"
+        },
+        "old_value": {
+          "title": "Old Value"
+        },
+        "new_value": {
+          "title": "New Value"
+        },
+        "reason": {
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "rule",
+        "field",
+        "old_value",
+        "new_value",
+        "reason"
+      ],
+      "title": "PolicyOverride",
+      "type": "object"
+    },
+    "Sentiment": {
+      "enum": [
+        "very_negative",
+        "negative",
+        "neutral",
+        "positive"
+      ],
+      "title": "Sentiment",
+      "type": "string"
+    },
+    "SentimentTrend": {
+      "enum": [
+        "improving",
+        "stable",
+        "worsening"
+      ],
+      "title": "SentimentTrend",
+      "type": "string"
+    },
+    "Team": {
+      "enum": [
+        "billing",
+        "sre",
+        "security",
+        "product",
+        "tier2_support",
+        "sales",
+        "account_management"
+      ],
+      "title": "Team",
+      "type": "string"
+    },
+    "ToolCallRecord": {
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "arguments": {
+          "additionalProperties": true,
+          "title": "Arguments",
+          "type": "object"
+        },
+        "output": {
+          "additionalProperties": true,
+          "title": "Output",
+          "type": "object"
+        },
+        "is_error": {
+          "default": false,
+          "title": "Is Error",
+          "type": "boolean"
+        },
+        "duration_ms": {
+          "title": "Duration Ms",
+          "type": "number"
+        }
+      },
+      "required": [
+        "name",
+        "arguments",
+        "output",
+        "duration_ms"
+      ],
+      "title": "ToolCallRecord",
+      "type": "object"
+    },
+    "TriageDecision": {
+      "additionalProperties": false,
+      "description": "Structured output produced by the LLM. Every field is required so the schema can be strict.",
+      "properties": {
+        "urgency": {
+          "$ref": "#/$defs/Urgency"
+        },
+        "urgency_reason": {
+          "description": "One or two sentences citing the evidence for the urgency.",
+          "title": "Urgency Reason",
+          "type": "string"
+        },
+        "product_area": {
+          "description": "Product area affected, e.g. 'billing/checkout', 'web app', 'appearance settings'.",
+          "title": "Product Area",
+          "type": "string"
+        },
+        "issue_types": {
+          "description": "All issue types present in the thread, most important first.",
+          "items": {
+            "$ref": "#/$defs/IssueType"
+          },
+          "title": "Issue Types",
+          "type": "array"
+        },
+        "sentiment": {
+          "$ref": "#/$defs/Sentiment",
+          "description": "Customer sentiment in the latest message."
+        },
+        "sentiment_trend": {
+          "$ref": "#/$defs/SentimentTrend",
+          "description": "How sentiment changed across the thread."
+        },
+        "language": {
+          "description": "ISO 639-1 code of the customer's language, e.g. 'en', 'th'.",
+          "title": "Language",
+          "type": "string"
+        },
+        "key_facts": {
+          "description": "Concrete facts an agent needs: amounts, errors, deadlines, scope of impact.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Key Facts",
+          "type": "array"
+        },
+        "kb_article_ids": {
+          "description": "IDs of knowledge-base articles actually used. Empty if none were relevant.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Kb Article Ids",
+          "type": "array"
+        },
+        "next_action": {
+          "$ref": "#/$defs/NextAction"
+        },
+        "route_to": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Team"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Team that should own the ticket. Null only for auto_respond."
+        },
+        "action_reason": {
+          "title": "Action Reason",
+          "type": "string"
+        },
+        "customer_reply": {
+          "description": "Draft reply to the customer, in the customer's language, grounded in tool/KB results.",
+          "title": "Customer Reply",
+          "type": "string"
+        },
+        "internal_note": {
+          "description": "Short hand-off note for the support team.",
+          "title": "Internal Note",
+          "type": "string"
+        },
+        "confidence": {
+          "description": "0.0-1.0 confidence in this triage decision.",
+          "title": "Confidence",
+          "type": "number"
+        }
+      },
+      "required": [
+        "urgency",
+        "urgency_reason",
+        "product_area",
+        "issue_types",
+        "sentiment",
+        "sentiment_trend",
+        "language",
+        "key_facts",
+        "kb_article_ids",
+        "next_action",
+        "route_to",
+        "action_reason",
+        "customer_reply",
+        "internal_note",
+        "confidence"
+      ],
+      "title": "TriageDecision",
+      "type": "object"
+    },
+    "Urgency": {
+      "enum": [
+        "critical",
+        "high",
+        "medium",
+        "low"
+      ],
+      "title": "Urgency",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "ticket_id": {
+      "title": "Ticket Id",
+      "type": "string"
+    },
+    "decision": {
+      "$ref": "#/$defs/TriageDecision"
+    },
+    "policy_overrides": {
+      "items": {
+        "$ref": "#/$defs/PolicyOverride"
+      },
+      "title": "Policy Overrides",
+      "type": "array"
+    },
+    "used_fallback": {
+      "default": false,
+      "title": "Used Fallback",
+      "type": "boolean"
+    },
+    "error": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Error"
+    },
+    "trace": {
+      "$ref": "#/$defs/AgentTrace"
+    }
+  },
+  "required": [
+    "ticket_id",
+    "decision",
+    "trace"
+  ],
+  "title": "TriageResult",
+  "type": "object"
+}

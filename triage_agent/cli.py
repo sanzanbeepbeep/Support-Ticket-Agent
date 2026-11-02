@@ -4,6 +4,7 @@
     triage run data/tickets/ --verbose    # also show tool calls and token usage
     triage run data/tickets/ --json       # machine-readable output
     triage eval --repeats 3               # score the agent against the golden set
+    triage schema                         # regenerate the JSON Schemas in schemas/
 """
 
 import argparse
@@ -13,11 +14,12 @@ import sys
 import textwrap
 from pathlib import Path
 
-from triage_agent.config import PROJECT_ROOT
+from triage_agent.config import PROJECT_ROOT, get_settings
 from triage_agent.evaluation import format_report, load_cases, run_evaluation, save_report
 from triage_agent.factory import build_agent
 from triage_agent.llm import LLMError
 from triage_agent.models import Ticket, TriageResult
+from triage_agent.schemas import export_schemas
 
 
 def collect_ticket_files(paths: list[Path]) -> list[Path]:
@@ -82,6 +84,12 @@ def cmd_eval(args: argparse.Namespace) -> int:
     return 0 if report.under_triage_count == 0 else 1
 
 
+def cmd_schema(args: argparse.Namespace) -> int:
+    for path in export_schemas(get_settings(), args.out):
+        print(f"wrote {path}")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="triage", description="Support ticket triage agent")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -97,6 +105,10 @@ def build_parser() -> argparse.ArgumentParser:
     evaluate.add_argument("--repeats", type=int, default=1, help="Runs per case, to measure consistency")
     evaluate.add_argument("--report-dir", type=Path, default=PROJECT_ROOT / "evals" / "reports")
     evaluate.set_defaults(handler=cmd_eval)
+
+    schema = sub.add_parser("schema", help="Export JSON Schemas for tickets, results and tools")
+    schema.add_argument("--out", type=Path, default=PROJECT_ROOT / "schemas")
+    schema.set_defaults(handler=cmd_schema)
     return parser
 
 

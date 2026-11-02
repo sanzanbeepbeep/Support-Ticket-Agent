@@ -89,7 +89,7 @@ class OpenAIClient:
                 model=self.model,
                 instructions=instructions,
                 input=[_to_input_item(item) for item in conversation],
-                tools=[_to_function_tool(spec) for spec in tools],
+                tools=[to_function_tool(spec) for spec in tools],
                 tool_choice="auto" if allow_tool_calls else "none",
                 text_format=output_type,
                 **optional,
@@ -115,7 +115,8 @@ class OpenAIClient:
         )
 
 
-def _to_function_tool(spec: ToolSpec) -> dict:
+def to_function_tool(spec: ToolSpec) -> dict:
+    """OpenAI Responses API function-tool definition."""
     return {
         "type": "function",
         "name": spec.name,

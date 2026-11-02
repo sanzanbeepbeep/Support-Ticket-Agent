@@ -1,0 +1,92 @@
+[
+  {
+    "type": "function",
+    "name": "get_customer_history",
+    "description": "Look up a customer's account: plan, account status, recent account events, usage and past support tickets. Call this first for every ticket.",
+    "parameters": {
+      "additionalProperties": false,
+      "properties": {
+        "customer_id": {
+          "description": "Customer ID from the ticket, e.g. 'C-1001'.",
+          "title": "Customer Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "customer_id"
+      ],
+      "title": "CustomerHistoryArgs",
+      "type": "object"
+    },
+    "strict": true
+  },
+  {
+    "type": "function",
+    "name": "get_billing_transactions",
+    "description": "Fetch recent payment transactions, subscription state and failed upgrade attempts for a customer. Use for any payment, charge, refund, invoice or plan-upgrade issue.",
+    "parameters": {
+      "additionalProperties": false,
+      "properties": {
+        "customer_id": {
+          "description": "Customer ID from the ticket.",
+          "title": "Customer Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "customer_id"
+      ],
+      "title": "BillingArgs",
+      "type": "object"
+    },
+    "strict": true
+  },
+  {
+    "type": "function",
+    "name": "check_service_status",
+    "description": "Check internal monitoring for active incidents, including ones not yet published on the public status page. Use for errors, outages, slowness or 'cannot access' reports.",
+    "parameters": {
+      "additionalProperties": false,
+      "properties": {
+        "region": {
+          "description": "Region to check. Use the customer's region; 'global' returns all regions.",
+          "enum": [
+            "global",
+            "asia",
+            "europe",
+            "north_america"
+          ],
+          "title": "Region",
+          "type": "string"
+        }
+      },
+      "required": [
+        "region"
+      ],
+      "title": "ServiceStatusArgs",
+      "type": "object"
+    },
+    "strict": true
+  },
+  {
+    "type": "function",
+    "name": "search_knowledge_base",
+    "description": "Search help-center FAQs and internal support procedures. Returns the most relevant articles. Call once per distinct sub-issue in the ticket.",
+    "parameters": {
+      "additionalProperties": false,
+      "properties": {
+        "query": {
+          "description": "Search query in English using product keywords (translate non-English tickets first), e.g. 'dark mode system default not working mac'.",
+          "title": "Query",
+          "type": "string"
+        }
+      },
+      "required": [
+        "query"
+      ],
+      "title": "KnowledgeBaseArgs",
+      "type": "object"
+    },
+    "strict": true
+  }
+]
