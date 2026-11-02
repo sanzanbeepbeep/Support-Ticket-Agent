@@ -51,9 +51,12 @@ def test_count_possible_duplicates_ignores_refunded():
 def test_service_status_reports_regional_incident(registry):
     asia = registry.execute("check_service_status", json.dumps({"region": "asia"}))
     europe = registry.execute("check_service_status", json.dumps({"region": "europe"}))
+    north_america = registry.execute("check_service_status", json.dumps({"region": "north_america"}))
     assert asia.output["overall_status"] == "degraded"
     assert asia.output["active_incidents"][0]["id"] == "INC-4821"
-    assert europe.output["overall_status"] == "operational"  # its only incident is resolved
+    # Europe has one incident still being monitored and one resolved; only the open one counts.
+    assert [i["id"] for i in europe.output["active_incidents"]] == ["INC-4815"]
+    assert north_america.output["overall_status"] == "operational"
 
 
 @pytest.mark.parametrize(
@@ -65,6 +68,10 @@ def test_service_status_reports_regional_incident(registry):
         ("error 500 cannot access multiple browsers", "KB-006"),
         ("status page says operational but asia region down", "KB-007"),
         ("how to log out", "KB-009"),
+        ("cancel annual plan refund", "KB-011"),
+        ("delete account personal data", "KB-012"),
+        ("csv import error IMP-413 file too large", "KB-013"),
+        ("add seats enterprise contract invoice currency", "KB-014"),
     ],
 )
 def test_knowledge_base_top_hit(kb, query, expected_id):

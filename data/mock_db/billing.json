@@ -13,6 +13,18 @@
       {"id": "inv_2026_03", "minutes_ago": 345600, "amount": 54000, "currency": "USD", "description": "Enterprise annual, 45 seats", "card_last4": null, "status": "captured"}
     ]
   },
+  "C-1004": {
+    "subscription": {"plan": "pro", "billing_cycle": "annual", "status": "paid", "days_since_purchase": 10},
+    "transactions": [
+      {"id": "tx_b31", "minutes_ago": 14400, "amount": 299.0, "currency": "USD", "description": "Pro annual", "card_last4": "7310", "status": "captured"}
+    ]
+  },
+  "C-1007": {
+    "subscription": {"plan": "enterprise", "billing_cycle": "annual", "status": "paid", "invoice_currency": "USD"},
+    "transactions": [
+      {"id": "inv_2025_09", "minutes_ago": 460800, "amount": 144000, "currency": "USD", "description": "Enterprise annual, 120 seats", "card_last4": null, "status": "captured"}
+    ]
+  },
   "C-3003": {
     "subscription": {"plan": "pro", "billing_cycle": "monthly", "status": "paid"},
     "transactions": [

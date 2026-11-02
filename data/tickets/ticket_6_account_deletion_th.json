@@ -1,0 +1,15 @@
+{
+  "ticket_id": "T-1006",
+  "customer": {
+    "customer_id": "C-1006",
+    "name": "Pimchanok S.",
+    "plan": "free",
+    "region": "asia",
+    "tenure_months": 11,
+    "seats": 1,
+    "notes": "Free plan, Thailand."
+  },
+  "messages": [
+    {"minutes_ago": 60, "text": "สวัสดีค่ะ ต้องการลบบัญชีและข้อมูลส่วนตัวทั้งหมดออกจากระบบค่ะ ไม่ได้ใช้งานแล้ว ต้องทำอย่างไรบ้างคะ และใช้เวลากี่วันคะ"}
+  ]
+}

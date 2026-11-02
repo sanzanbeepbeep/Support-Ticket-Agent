@@ -1,0 +1,15 @@
+{
+  "ticket_id": "T-1008",
+  "customer": {
+    "customer_id": "C-1008",
+    "name": "Tom Brennan",
+    "plan": "pro",
+    "region": "north_america",
+    "tenure_months": 7,
+    "seats": 1,
+    "notes": ""
+  },
+  "messages": [
+    {"minutes_ago": 45, "text": "CSV import keeps failing with 'Error IMP-413'. The file is an export from our CRM, about 80 MB. Smaller test files worked fine. What am I doing wrong?"}
+  ]
+}

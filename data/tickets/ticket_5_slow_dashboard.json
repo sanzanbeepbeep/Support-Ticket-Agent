@@ -1,0 +1,16 @@
+{
+  "ticket_id": "T-1005",
+  "customer": {
+    "customer_id": "C-1005",
+    "name": "Lukas Becker (Nordwind GmbH)",
+    "plan": "pro",
+    "region": "europe",
+    "tenure_months": 18,
+    "seats": 8,
+    "notes": "Team of 8 on Pro. Uses reporting heavily."
+  },
+  "messages": [
+    {"minutes_ago": 1500, "text": "Since yesterday the Reports dashboard takes 30+ seconds to load, sometimes it times out. Other pages are fine."},
+    {"minutes_ago": 240, "text": "Still slow today, and two colleagues see the same thing. We send weekly reports to management every Friday morning, so it would be great to have this fixed before then."}
+  ]
+}

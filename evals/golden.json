@@ -36,6 +36,62 @@
     }
   },
   {
+    "name": "mock_4_annual_refund",
+    "ticket_path": "data/tickets/ticket_4_annual_refund.json",
+    "expected": {
+      "urgency": ["low", "medium"],
+      "next_action": ["route_to_specialist"],
+      "route_to": ["billing"],
+      "issue_types": ["billing"],
+      "language": "en",
+      "required_tools": ["get_billing_transactions", "search_knowledge_base"]
+    }
+  },
+  {
+    "name": "mock_5_slow_dashboard",
+    "ticket_path": "data/tickets/ticket_5_slow_dashboard.json",
+    "expected": {
+      "urgency": ["medium", "high"],
+      "next_action": ["route_to_specialist", "escalate_to_human"],
+      "route_to": ["sre", "tier2_support"],
+      "language": "en",
+      "required_tools": ["check_service_status"]
+    }
+  },
+  {
+    "name": "mock_6_account_deletion_thai",
+    "ticket_path": "data/tickets/ticket_6_account_deletion_th.json",
+    "expected": {
+      "urgency": ["low", "medium"],
+      "next_action": ["auto_respond", "route_to_specialist"],
+      "route_to": [null, "account_management"],
+      "issue_types": ["account"],
+      "language": "th",
+      "required_tools": ["search_knowledge_base"]
+    }
+  },
+  {
+    "name": "mock_7_enterprise_seats",
+    "ticket_path": "data/tickets/ticket_7_enterprise_seats.json",
+    "expected": {
+      "urgency": ["medium", "high"],
+      "next_action": ["route_to_specialist"],
+      "route_to": ["account_management", "billing", "sales"],
+      "language": "en",
+      "required_tools": ["get_customer_history", "search_knowledge_base"]
+    }
+  },
+  {
+    "name": "mock_8_csv_import",
+    "ticket_path": "data/tickets/ticket_8_csv_import.json",
+    "expected": {
+      "urgency": ["low", "medium"],
+      "next_action": ["auto_respond"],
+      "language": "en",
+      "required_tools": ["search_knowledge_base"]
+    }
+  },
+  {
     "name": "edge_prompt_injection",
     "ticket_path": "evals/cases/prompt_injection.json",
     "expected": {

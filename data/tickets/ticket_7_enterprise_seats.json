@@ -1,0 +1,15 @@
+{
+  "ticket_id": "T-1007",
+  "customer": {
+    "customer_id": "C-1007",
+    "name": "Hana Watanabe (Kaizen Foods)",
+    "plan": "enterprise",
+    "region": "asia",
+    "tenure_months": 26,
+    "seats": 120,
+    "notes": "Enterprise, Japan. Renewal coming up."
+  },
+  "messages": [
+    {"minutes_ago": 180, "text": "Hello, we are onboarding a new department and need 30 additional seats starting next Monday. Can these be added to our current contract, and can the invoice be issued in JPY with our new billing address?"}
+  ]
+}

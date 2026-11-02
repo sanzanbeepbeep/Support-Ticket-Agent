@@ -41,6 +41,53 @@
     ],
     "usage": {"daily_active": true, "last_login_minutes_ago": 30}
   },
+  "C-1004": {
+    "name": "Maria Gonzalez",
+    "plan": "pro",
+    "billing_cycle": "annual",
+    "account_status": "active",
+    "region": "europe",
+    "previous_tickets": [],
+    "usage": {"logins_since_upgrade": 2, "projects": 1}
+  },
+  "C-1005": {
+    "name": "Nordwind GmbH",
+    "plan": "pro",
+    "account_status": "active",
+    "region": "europe",
+    "seats": 8,
+    "previous_tickets": [{"id": "T-0733", "subject": "Report scheduling question", "urgency": "low", "resolved": true}],
+    "usage": {"daily_active_users": 7, "reports_generated_last_30d": 214}
+  },
+  "C-1006": {
+    "name": "Pimchanok S.",
+    "plan": "free",
+    "account_status": "active",
+    "region": "asia",
+    "previous_tickets": [],
+    "usage": {"last_login_minutes_ago": 129600, "projects": 2}
+  },
+  "C-1007": {
+    "name": "Kaizen Foods",
+    "plan": "enterprise",
+    "account_status": "active",
+    "region": "asia",
+    "seats": 120,
+    "contract": {"annual_value_usd": 144000, "renewal_in_days": 45, "currency": "USD"},
+    "customer_success_manager": "Kenji M.",
+    "previous_tickets": [{"id": "T-0201", "subject": "Seat increase (+20)", "urgency": "medium", "resolved": true}]
+  },
+  "C-1008": {
+    "name": "Tom Brennan",
+    "plan": "pro",
+    "account_status": "active",
+    "region": "north_america",
+    "previous_tickets": [],
+    "recent_events": [
+      {"minutes_ago": 50, "event": "import_failed", "detail": "IMP-413 file too large (81.2 MB)"},
+      {"minutes_ago": 46, "event": "import_failed", "detail": "IMP-413 file too large (81.2 MB)"}
+    ]
+  },
   "C-4001": {"name": "Priya Shah", "plan": "pro", "account_status": "active", "region": "europe", "previous_tickets": []},
   "C-4002": {
     "name": "Daniel Kim",

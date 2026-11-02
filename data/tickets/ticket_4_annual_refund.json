@@ -1,0 +1,16 @@
+{
+  "ticket_id": "T-1004",
+  "customer": {
+    "customer_id": "C-1004",
+    "name": "Maria Gonzalez",
+    "plan": "pro",
+    "region": "europe",
+    "tenure_months": 0,
+    "seats": 1,
+    "notes": "Switched to Pro annual 10 days ago."
+  },
+  "messages": [
+    {"minutes_ago": 300, "text": "Hi, I upgraded to the annual Pro plan last week but it turns out my team is moving to another tool. Can I cancel and get my money back?"},
+    {"minutes_ago": 20, "text": "Just following up on this. It was $299 and I've barely used it. Thanks."}
+  ]
+}

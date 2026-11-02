@@ -10,6 +10,16 @@
     "published_on_status_page": false
   },
   {
+    "id": "INC-4815",
+    "region": "europe",
+    "component": "reporting service (eu-west-1)",
+    "status": "monitoring",
+    "severity": "minor",
+    "started_minutes_ago": 1560,
+    "summary": "Slow report queries for some EU tenants after a database index change. Mitigation deployed, monitoring.",
+    "published_on_status_page": true
+  },
+  {
     "id": "INC-4790",
     "region": "europe",
     "component": "email notifications",
