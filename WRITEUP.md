@@ -31,11 +31,18 @@ deterministic **policy layer** → `TriageResult` with a full trace.
 | Under-triage of a serious issue | Policy floor rules; the prompt says over-triage is cheaper; under-triage tracked as its own eval metric |
 | Hallucinated answers or policies | Reply grounded in tool/KB output; citations checked against retrieved IDs; no auto-respond without a grounded article |
 | Prompt injection in ticket text | Ticket wrapped in `<ticket>` and declared as data; tools are read-only; policy runs after the LLM; injection case in the eval set |
-| Promising refunds or ETAs | Explicit prompt rule plus KB guidance; production: an output check for commitments before sending |
+| Promising refunds or ETAs | Prompt rule; an auto-reply containing a refund, guarantee or deadline commitment is sent to a human instead |
+| Context collision (an unrelated incident in the same region "explains" a vague ticket) | Found by the eval. Fixed by linking incidents only when the symptoms match, and by forcing escalation only for major incidents |
+| Model skips investigation | Required tools (customer history, KB): if the model decides early, it is sent back to call them |
 | LLM/API outage, rate limits, bad JSON | SDK retries with backoff; tool errors returned to the model as data; on failure → **fail-safe escalation to a human** |
 | Tool returns stale or missing data | `found: false` is handled explicitly; confidence drops; the policy blocks auto-respond |
 | Cost and latency | Iteration cap; tokens tracked per ticket; production: a small model for clear low-risk tickets and a large one for the rest |
 | PII in logs and prompts | Production: redact card and contact data before logging; data retention settings |
+
+**Current results (gpt-4.1):** 13/13 golden cases pass, with 0 under-triaged. Repeated 3 times, the critical and
+vague cases gave the same labels every run. In a red-team run, the model was instructed to answer low urgency,
+auto-respond, cite a fake KB article and promise a refund. The policy layer still escalated the billing, outage and
+security tickets, removed the fake citation, and stopped the promising auto-replies.
 
 ## How I'd evaluate it in production
 

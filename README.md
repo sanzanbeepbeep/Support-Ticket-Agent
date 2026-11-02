@@ -25,10 +25,13 @@ All settings are environment variables (see [.env.example](.env.example)). `OPEN
 
 ## Run
 
-Triage the three sample tickets:
+Triage the tickets in `data/tickets/`: the 3 samples from the brief (`ticket_1`-`ticket_3`) plus 5 extra mock
+tickets (`ticket_4`-`ticket_8`: annual refund, slow dashboard during an EU incident, Thai account-deletion request,
+Enterprise seat increase, CSV import error):
 
 ```bash
-triage run data/tickets/            # human-readable output
+triage run data/tickets/                                 # all tickets
+triage run data/tickets/ticket_2_outage_th.json          # a single ticket
 triage run data/tickets/ --verbose  # + tool calls, tokens, latency, prompt version
 triage run data/tickets/ --json     # full structured result
 ```
@@ -48,7 +51,7 @@ Interactive docs are served at http://localhost:8000/docs.
 
 ```bash
 pytest                    # offline unit tests, no API key needed (scripted fake LLM)
-triage eval               # golden set: 3 samples + 5 edge cases, real model
+triage eval               # golden set: 8 tickets + 5 edge cases, real model
 triage eval --repeats 3   # also measures consistency across runs
 ```
 
@@ -72,7 +75,7 @@ triage_agent/
   factory.py         wiring of concrete implementations
   cli.py, api.py     interfaces
 data/
-  tickets/           the 3 sample tickets
+  tickets/           the 3 sample tickets + 5 extra mock tickets
   kb/                knowledge-base articles
   mock_db/           customers, billing, incidents (mock backends)
 evals/
@@ -91,4 +94,16 @@ tests/               pytest suite
 | `search_knowledge_base` | BM25 search over FAQ/procedure articles | `data/kb/*.md` |
 
 Tool schemas are generated from each tool's Pydantic argument model and sent as strict function definitions.
+
+## Schemas
+
+The JSON Schemas in [schemas/](schemas/) are generated from the Pydantic models with `triage schema`. A test fails if
+they get out of date.
+
+| File | What it describes |
+|---|---|
+| `ticket.schema.json` | Input ticket (`POST /triage` body, files in `data/tickets/`) |
+| `triage_decision.schema.json` | Structured output the model must return (strict, every field required) |
+| `triage_result.schema.json` | Full result: final decision + policy overrides + trace |
+| `tools.json` | The 4 tool definitions exactly as sent to the OpenAI Responses API |
 To add a tool, subclass `Tool` in `triage_agent/tools/`, then register it in `factory.build_tools`.
