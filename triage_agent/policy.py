@@ -82,6 +82,23 @@ class Rule(ABC):
         """Return the changes this rule requires (empty if the rule does not apply)."""
 
 
+# The team that owns each issue type, used when a decision needs a team but the model gave none.
+_TEAM_FOR_ISSUE = {
+    IssueType.SECURITY: Team.SECURITY,
+    IssueType.OUTAGE: Team.SRE,
+    IssueType.BILLING: Team.BILLING,
+    IssueType.ACCOUNT: Team.ACCOUNT_MANAGEMENT,
+    IssueType.SALES: Team.SALES,
+    IssueType.BUG: Team.PRODUCT,
+    IssueType.FEATURE_REQUEST: Team.PRODUCT,
+}
+
+
+def default_team(issue_types: list[IssueType]) -> Team:
+    """Owner of the most important issue (`issue_types` is ordered most important first)."""
+    return next((_TEAM_FOR_ISSUE[issue] for issue in issue_types if issue in _TEAM_FOR_ISSUE), Team.TIER2_SUPPORT)
+
+
 def escalate(urgency: Urgency, team: Team, reason: str) -> list[Change]:
     return [
         Change("urgency", urgency, reason),
@@ -190,8 +207,19 @@ class AutoRespondGuardRule(Rule):
         reason = "; ".join(problems)
         return [
             Change("next_action", NextAction.ROUTE_TO_SPECIALIST, reason),
-            Change("route_to", decision.route_to or Team.TIER2_SUPPORT, reason),
+            Change("route_to", decision.route_to or default_team(decision.issue_types), reason),
         ]
+
+
+class RoutingConsistencyRule(Rule):
+    """Every ticket that is not answered automatically must have an owning team."""
+
+    name = "routing_consistency"
+
+    def evaluate(self, decision: TriageDecision, context: PolicyContext) -> list[Change]:
+        if decision.next_action == NextAction.AUTO_RESPOND or decision.route_to is not None:
+            return []
+        return [Change("route_to", default_team(decision.issue_types), f"{decision.next_action} requires a team")]
 
 
 class PolicyEngine:
@@ -223,4 +251,5 @@ def default_policy(auto_respond_min_confidence: float) -> PolicyEngine:
         SecurityRule(),
         GroundingRule(),
         AutoRespondGuardRule(auto_respond_min_confidence),
+        RoutingConsistencyRule(),
     ])

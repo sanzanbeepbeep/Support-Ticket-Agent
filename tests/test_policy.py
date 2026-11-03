@@ -104,3 +104,35 @@ def test_grounded_confident_auto_respond_is_kept(dark_mode_ticket):
 
     assert final.next_action == NextAction.AUTO_RESPOND
     assert overrides == []
+
+
+@pytest.mark.parametrize(
+    ("issue_types", "team"),
+    [(["account"], Team.ACCOUNT_MANAGEMENT), (["feature_request"], Team.PRODUCT), (["how_to"], Team.TIER2_SUPPORT)],
+)
+def test_blocked_auto_reply_goes_to_the_team_that_owns_the_issue(dark_mode_ticket, issue_types, team):
+    decision = make_decision(
+        next_action=NextAction.AUTO_RESPOND, route_to=None, kb_article_ids=[], issue_types=issue_types
+    )
+
+    final, _ = policy.apply(decision, PolicyContext(dark_mode_ticket, []))
+
+    assert (final.next_action, final.route_to) == (NextAction.ROUTE_TO_SPECIALIST, team)
+
+
+def test_escalation_without_a_team_gets_one(dark_mode_ticket):
+    decision = make_decision(next_action=NextAction.ESCALATE_TO_HUMAN, route_to=None, issue_types=["bug", "billing"])
+
+    final, overrides = policy.apply(decision, PolicyContext(dark_mode_ticket, []))
+
+    assert final.route_to == Team.PRODUCT  # issue_types are ordered most important first
+    assert [o.rule for o in overrides] == ["routing_consistency"]
+
+
+def test_auto_respond_keeps_null_route(dark_mode_ticket):
+    decision = make_decision(next_action=NextAction.AUTO_RESPOND, route_to=None, kb_article_ids=["KB-004"])
+    context = PolicyContext(dark_mode_ticket, [record("search_knowledge_base", {"results": [{"id": "KB-004"}]})])
+
+    final, _ = policy.apply(decision, context)
+
+    assert final.route_to is None
