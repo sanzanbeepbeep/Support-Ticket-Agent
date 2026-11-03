@@ -140,5 +140,28 @@
       "route_to": ["sales"],
       "issue_types": ["sales"]
     }
+  },
+  {
+    "name": "edge_recurring_issue_thai",
+    "ticket_path": "evals/cases/recurring_issue_th.json",
+    "expected": {
+      "urgency": ["high"],
+      "next_action": ["route_to_specialist", "escalate_to_human"],
+      "route_to": ["tier2_support", "product", "sre"],
+      "issue_types": ["bug"],
+      "language": "th",
+      "required_tools": ["get_customer_history"]
+    }
+  },
+  {
+    "name": "edge_unrelated_history",
+    "ticket_path": "evals/cases/unrelated_history.json",
+    "expected": {
+      "urgency": ["low"],
+      "next_action": ["auto_respond"],
+      "issue_types": ["how_to"],
+      "language": "en",
+      "required_tools": ["get_customer_history", "search_knowledge_base"]
+    }
   }
 ]

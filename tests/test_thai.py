@@ -131,6 +131,51 @@ def test_grounded_thai_auto_reply_without_commitment_is_kept(deletion_ticket):
     assert overrides == []
 
 
+KB_012_BODY = "All projects and personal data are permanently deleted within **30 days**. Backups are purged within 90 days."
+
+
+@pytest.mark.parametrize(
+    ("reply", "kept"),
+    [
+        # Restates the KB policy (30 days): a fact, not a promise. Seen live in `triage eval`.
+        ("คุณลบบัญชีได้เองที่ Settings > Account > Delete account ข้อมูลทั้งหมดจะถูกลบภายใน 30 วันค่ะ", True),
+        ("All your data is permanently deleted within 30 days.", True),
+        # A deadline the KB never states is still a commitment.
+        ("ทีมงานจะลบข้อมูลให้ภายใน 2 วันค่ะ", False),
+        # A KB duration does not excuse a refund promise in the same reply.
+        ("ข้อมูลจะถูกลบภายใน 30 วัน และเราได้อนุมัติการคืนเงินให้แล้วค่ะ", False),
+    ],
+)
+def test_deadline_restated_from_cited_kb_is_not_a_commitment(deletion_ticket, reply, kept):
+    kb_search = ToolCallRecord(
+        name="search_knowledge_base", arguments={},
+        output={"results": [{"id": "KB-012", "content": KB_012_BODY}]}, duration_ms=1.0,
+    )
+    decision = make_decision(
+        next_action=NextAction.AUTO_RESPOND, route_to=None, kb_article_ids=["KB-012"], customer_reply=reply,
+    )
+
+    final, _ = policy.apply(decision, PolicyContext(deletion_ticket, [kb_search]))
+
+    assert (final.next_action == NextAction.AUTO_RESPOND) is kept
+
+
+def test_kb_duration_only_counts_when_the_article_is_cited(deletion_ticket):
+    kb_search = ToolCallRecord(
+        name="search_knowledge_base", arguments={},
+        output={"results": [{"id": "KB-012", "content": KB_012_BODY}, {"id": "KB-004", "content": "dark mode"}]},
+        duration_ms=1.0,
+    )
+    decision = make_decision(
+        next_action=NextAction.AUTO_RESPOND, route_to=None, kb_article_ids=["KB-004"],
+        customer_reply="ข้อมูลจะถูกลบภายใน 30 วันค่ะ",
+    )
+
+    final, _ = policy.apply(decision, PolicyContext(deletion_ticket, [kb_search]))
+
+    assert final.next_action == NextAction.ROUTE_TO_SPECIALIST
+
+
 # --------------------------------------------------------------------------- knowledge base
 
 

@@ -102,5 +102,30 @@
   },
   "C-4003": {"name": "Chris Doe", "plan": "free", "account_status": "active", "region": "north_america", "previous_tickets": []},
   "C-4004": {"name": "Sam Taylor", "plan": "free", "account_status": "active", "region": "europe", "previous_tickets": []},
-  "C-4005": {"name": "Global Retail Inc.", "plan": "pro", "account_status": "active", "region": "north_america", "seats": 12, "previous_tickets": []}
+  "C-4005": {"name": "Global Retail Inc.", "plan": "pro", "account_status": "active", "region": "north_america", "seats": 12, "previous_tickets": []},
+  "C-4006": {
+    "name": "Naree W. (Bangkok Foods)",
+    "plan": "pro",
+    "account_status": "active",
+    "region": "asia",
+    "seats": 8,
+    "previous_tickets": [
+      {"id": "T-0921", "subject": "Scheduled weekly report emails not delivered", "urgency": "medium", "resolved": true,
+       "resolved_days_ago": 12, "resolution": "Mail queue fix deployed; reports confirmed delivered the following Monday"}
+    ],
+    "recent_events": [
+      {"minutes_ago": 300, "event": "scheduled_report_failed", "detail": "weekly_exec_summary: email delivery failed (8 recipients)"}
+    ]
+  },
+  "C-4007": {
+    "name": "Lena Fischer",
+    "plan": "pro",
+    "account_status": "active",
+    "region": "europe",
+    "previous_tickets": [
+      {"id": "T-0388", "subject": "Payment failed on upgrade", "urgency": "high", "resolved": true},
+      {"id": "T-0502", "subject": "Invoice VAT number missing", "urgency": "medium", "resolved": true},
+      {"id": "T-0644", "subject": "CSV import question", "urgency": "low", "resolved": true}
+    ]
+  }
 }

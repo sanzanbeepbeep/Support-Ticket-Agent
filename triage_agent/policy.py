@@ -39,6 +39,19 @@ _COMMITMENT_PATTERN = re.compile(
     r"|ภายใน\s*\d+\s*(นาที|ชั่วโมง|ชม\.?|วัน)|ภายใน(วันนี้|คืนนี้|พรุ่งนี้|วันพรุ่งนี้|สิ้นวัน|วัน(จันทร์|อังคาร|พุธ|พฤหัส|ศุกร์))",
     re.IGNORECASE,
 )
+# "within N <unit>" in English or Thai, normalised so a Thai reply can be checked against an English KB article.
+_DURATION = re.compile(r"(\d+)\s*(minute|hour|day|นาที|ชั่วโมง|ชม|วัน)", re.IGNORECASE)
+_DURATION_UNITS = {"นาที": "minute", "ชั่วโมง": "hour", "ชม": "hour", "วัน": "day"}
+
+
+def _quoted_from_kb(commitment: str, kb_texts: list[str]) -> bool:
+    """True when a deadline in the reply restates a duration from a cited KB article (a policy fact, not a promise)."""
+    duration = _DURATION.search(commitment)
+    if not duration:
+        return False
+    number, unit = duration.group(1), _DURATION_UNITS.get(duration.group(2), duration.group(2).lower())
+    stated = re.compile(rf"\b{number}\**\s*{unit}s?\b", re.IGNORECASE)
+    return any(stated.search(text) for text in kb_texts)
 
 
 @dataclass(frozen=True)
@@ -160,8 +173,18 @@ class AutoRespondGuardRule(Rule):
             problems.append("no grounded knowledge-base article")
         if decision.urgency.rank >= Urgency.HIGH.rank:
             problems.append(f"urgency is {decision.urgency}")
-        if commitment := _COMMITMENT_PATTERN.search(decision.customer_reply):
-            problems.append(f"reply makes a commitment a human must approve: '{commitment.group(0)}'")
+        cited_kb = [
+            result.get("content", "")
+            for out in context.outputs_of("search_knowledge_base")
+            for result in out.get("results", [])
+            if result.get("id") in decision.kb_article_ids
+        ]
+        commitments = [
+            match.group(0) for match in _COMMITMENT_PATTERN.finditer(decision.customer_reply)
+            if not _quoted_from_kb(match.group(0), cited_kb)
+        ]
+        if commitments:
+            problems.append(f"reply makes a commitment a human must approve: '{commitments[0]}'")
         if not problems:
             return []
         reason = "; ".join(problems)

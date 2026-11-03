@@ -23,7 +23,7 @@
 | LLM/API failure | Retries, then fail-safe escalation to a human |
 | Cost and PII | Iteration cap, token tracking; redact PII in production |
 
-**Results (gpt-4.1):** 13/13 golden cases pass, 0 under-triaged, stable across 3 runs. A red-team run that told the model to under-triage and promise refunds was corrected by the policy layer.
+**Results (gpt-4.1):** 15/15 golden cases pass, 0 under-triaged, stable across 3 runs (45/45). A red-team run that told the model to under-triage and promise refunds was corrected by the policy layer.
 
 ## How I'd evaluate it in production
 

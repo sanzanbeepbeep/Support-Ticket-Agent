@@ -51,7 +51,7 @@ Interactive docs are served at http://localhost:8000/docs.
 
 ```bash
 pytest                    # offline unit tests, no API key needed (scripted fake LLM)
-triage eval               # golden set: 8 tickets + 5 edge cases, real model
+triage eval               # golden set: 8 tickets + 7 edge cases, real model
 triage eval --repeats 3   # also measures consistency across runs
 ```
 

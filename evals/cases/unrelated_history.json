@@ -1,0 +1,7 @@
+{
+  "ticket_id": "E-07",
+  "customer": {"customer_id": "C-4007", "name": "Lena Fischer", "plan": "pro", "region": "europe", "tenure_months": 30},
+  "messages": [
+    {"minutes_ago": 8, "text": "Hi, quick one: how do I switch the app to dark mode? Thanks!"}
+  ]
+}
