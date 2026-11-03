@@ -1,9 +1,10 @@
 from fastapi.testclient import TestClient
 
+from triage_agent import api, cli
 from triage_agent.api import app, get_agent
 from triage_agent.config import PROJECT_ROOT
 from triage_agent.evaluation import Expectation, load_cases, score_result
-from triage_agent.llm import LLMResponse
+from triage_agent.llm import LLMError, LLMResponse
 from triage_agent.models import AgentTrace, NextAction, TriageResult, Urgency
 
 from tests.conftest import make_decision
@@ -69,3 +70,33 @@ def test_golden_set_is_valid_and_tickets_load():
     assert len(cases) >= 8
     for case in cases:
         assert case.load_ticket(PROJECT_ROOT).ticket_id
+
+
+def test_triage_endpoint_returns_503_when_agent_cannot_start(monkeypatch, dark_mode_ticket):
+    def broken():
+        raise LLMError("OPENAI_API_KEY is not set.")
+
+    monkeypatch.setattr(api, "build_agent", broken)
+    api._cached_agent.cache_clear()
+    try:
+        response = TestClient(app).post("/triage", json=dark_mode_ticket.model_dump(mode="json"))
+    finally:
+        api._cached_agent.cache_clear()
+
+    assert response.status_code == 503
+    assert "OPENAI_API_KEY" in response.json()["detail"]
+
+
+def test_cli_reports_bad_ticket_files_before_calling_the_model(monkeypatch, tmp_path, capsys):
+    def must_not_build():
+        raise AssertionError("agent built despite invalid input")
+
+    monkeypatch.setattr(cli, "build_agent", must_not_build)
+    bad = tmp_path / "bad.json"
+    bad.write_text('{"ticket_id": "x"}', encoding="utf-8")
+
+    exit_code = cli.main(["run", str(bad), str(tmp_path / "missing.json")])
+
+    err = capsys.readouterr().err
+    assert exit_code == 2
+    assert "bad.json: not a valid ticket" in err and "missing.json: cannot read file" in err

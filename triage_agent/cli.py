@@ -14,6 +14,8 @@ import sys
 import textwrap
 from pathlib import Path
 
+from pydantic import ValidationError
+
 from triage_agent.config import PROJECT_ROOT, get_settings
 from triage_agent.evaluation import format_report, load_cases, run_evaluation, save_report
 from triage_agent.factory import build_agent
@@ -55,6 +57,8 @@ def format_result(result: TriageResult, verbose: bool = False) -> str:
         trace = result.trace
         lines.append(f"Trace: {trace.iterations} iterations, {trace.input_tokens}+{trace.output_tokens} tokens, "
                      f"{trace.latency_ms / 1000:.1f}s, {trace.model}, {trace.prompt_version}")
+        if trace.missing_required_tools:
+            lines.append(f"  WARNING required tools never called: {', '.join(trace.missing_required_tools)}")
         lines += [
             f"  tool {call.name}({json.dumps(call.arguments, ensure_ascii=False)})"
             f"{' ERROR' if call.is_error else ''} {call.duration_ms}ms"
@@ -63,11 +67,29 @@ def format_result(result: TriageResult, verbose: bool = False) -> str:
     return "\n".join(lines) + "\n"
 
 
+def load_tickets(files: list[Path]) -> tuple[list[Ticket], list[str]]:
+    """Load every ticket up front, so one bad file is reported before any tokens are spent."""
+    tickets, errors = [], []
+    for path in files:
+        try:
+            tickets.append(Ticket.model_validate_json(path.read_text(encoding="utf-8")))
+        except OSError as exc:
+            errors.append(f"{path}: cannot read file ({exc.strerror or exc})")
+        except ValidationError as exc:
+            errors.append(f"{path}: not a valid ticket ({exc.error_count()} errors, first: {exc.errors()[0]['msg']})")
+    return tickets, errors
+
+
 def cmd_run(args: argparse.Namespace) -> int:
+    tickets, errors = load_tickets(collect_ticket_files(args.paths))
+    if errors or not tickets:
+        for error in errors or ["no ticket files found"]:
+            print(f"Error: {error}", file=sys.stderr)
+        return 2
+
     agent = build_agent()
     results = []
-    for path in collect_ticket_files(args.paths):
-        ticket = Ticket.model_validate_json(path.read_text(encoding="utf-8"))
+    for ticket in tickets:
         result = agent.triage(ticket)
         results.append(result)
         if not args.json:

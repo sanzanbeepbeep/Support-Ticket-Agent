@@ -9,7 +9,10 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore", env_parse_none_str="none")
+    # The project .env is found from any working directory; a .env in the current directory overrides it.
+    model_config = SettingsConfigDict(
+        env_file=(PROJECT_ROOT / ".env", ".env"), extra="ignore", env_parse_none_str="none"
+    )
 
     openai_api_key: str | None = None
     # Any OpenAI-compatible endpoint (Azure proxy, vLLM, Ollama...) can be used by setting a base URL.

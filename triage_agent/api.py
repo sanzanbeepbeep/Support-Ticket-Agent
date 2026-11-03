@@ -3,18 +3,26 @@
 from functools import lru_cache
 from typing import Annotated
 
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, HTTPException
 
 from triage_agent.agent import TriageAgent
 from triage_agent.factory import build_agent
+from triage_agent.llm import LLMError
 from triage_agent.models import Ticket, TriageResult
 
 app = FastAPI(title="Support Ticket Triage Agent", version="0.1.0")
 
 
 @lru_cache
-def get_agent() -> TriageAgent:
+def _cached_agent() -> TriageAgent:
     return build_agent()
+
+
+def get_agent() -> TriageAgent:
+    try:
+        return _cached_agent()
+    except LLMError as exc:  # e.g. missing API key: a configuration problem, not a server crash
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
 
 
 @app.get("/health")
