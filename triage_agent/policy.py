@@ -22,13 +22,21 @@ from triage_agent.models import (
     Urgency,
 )
 
-_DISPUTE_PATTERN = re.compile(r"\b(disput\w*|charge ?backs?|lawyers?|legal action|sue)\b", re.IGNORECASE)
-# Commitments only a human may make: refunds, credits, guarantees, deadlines. English-only heuristic.
+# Keyword heuristics for English and Thai, the two languages in the ticket set. Thai is written without spaces
+# between words, so the Thai alternatives are matched as substrings instead of using `\b`.
+_DISPUTE_PATTERN = re.compile(
+    r"\b(disput\w*|charge ?backs?|lawyers?|legal action|sue)\b"
+    r"|ฟ้อง|ทนาย|ดำเนินคดี|แจ้งความ|สคบ|แจ้ง(ธนาคาร|บัตร)|ปฏิเสธการชำระ",
+    re.IGNORECASE,
+)
+# Commitments only a human may make: refunds, credits, guarantees, deadlines.
 _COMMITMENT_PATTERN = re.compile(
     r"\b(refund (has been|was|will be) (issued|processed|approved)|you will (receive|get) (a |your )?(full )?refund"
     r"|(we|i) (have )?(approved|issued|processed) (a |your )?(full )?refund|credit (has been|will be) applied"
     r"|guarantee[ds]?|by (today|tonight|tomorrow|monday|tuesday|wednesday|thursday|friday|end of (the )?day)"
-    r"|within \d+ (minutes?|hours?|days?))\b",
+    r"|within \d+ (minutes?|hours?|days?))\b"
+    r"|อนุมัติ(การ)?คืนเงิน|คืนเงินให้(คุณ|ท่าน)?(เรียบร้อย)?แล้ว|จะได้รับเงินคืน|รับประกัน"
+    r"|ภายใน\s*\d+\s*(นาที|ชั่วโมง|ชม\.?|วัน)|ภายใน(วันนี้|คืนนี้|พรุ่งนี้|วันพรุ่งนี้|สิ้นวัน|วัน(จันทร์|อังคาร|พุธ|พฤหัส|ศุกร์))",
     re.IGNORECASE,
 )
 
