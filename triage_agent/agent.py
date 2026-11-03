@@ -92,6 +92,9 @@ class TriageAgent:
                     # The model skipped mandatory investigation: send it back once more instead of trusting it.
                     conversation.append(f"Your investigation is incomplete. Call {', '.join(missing)} before deciding.")
                     continue
+                if missing:
+                    logger.warning("Ticket %s decided without required tools: %s", ticket.ticket_id, missing)
+                trace.missing_required_tools = missing
                 return response.parsed
 
             for call in response.tool_calls:

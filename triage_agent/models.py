@@ -3,7 +3,7 @@
 from enum import StrEnum
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 # --------------------------------------------------------------------------- input
 
@@ -112,6 +112,12 @@ class TriageDecision(BaseModel):
     internal_note: str = Field(description="Short hand-off note for the support team.")
     confidence: float = Field(description="0.0-1.0 confidence in this triage decision.")
 
+    @field_validator("confidence")
+    @classmethod
+    def _clamp_confidence(cls, value: float) -> float:
+        # Clamped instead of bounded with ge/le, which would change the strict schema sent to the model.
+        return min(max(value, 0.0), 1.0)
+
 
 class PolicyOverride(BaseModel):
     rule: str
@@ -137,6 +143,9 @@ class AgentTrace(BaseModel):
     output_tokens: int = 0
     latency_ms: float = 0.0
     tool_calls: list[ToolCallRecord] = Field(default_factory=list)
+    missing_required_tools: list[str] = Field(
+        default_factory=list, description="Required tools the model still had not called when it had to decide."
+    )
 
     def tool_names(self) -> set[str]:
         return {call.name for call in self.tool_calls}

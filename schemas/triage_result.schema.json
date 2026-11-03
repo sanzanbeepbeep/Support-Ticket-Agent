@@ -36,6 +36,14 @@
           },
           "title": "Tool Calls",
           "type": "array"
+        },
+        "missing_required_tools": {
+          "description": "Required tools the model still had not called when it had to decide.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Missing Required Tools",
+          "type": "array"
         }
       },
       "required": [
