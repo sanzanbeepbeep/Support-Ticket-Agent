@@ -1,4 +1,4 @@
-from collections import Counter
+from collections import defaultdict
 from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -39,11 +39,18 @@ class BillingTransactionsTool(Tool):
         }
 
 
-def count_possible_duplicates(transactions: list[dict[str, Any]]) -> int:
-    """Number of extra non-refunded charges sharing the same amount and description."""
-    keys = Counter(
-        (tx["amount"], tx["description"])
-        for tx in transactions
-        if tx["status"] in {"pending", "captured"}
-    )
-    return sum(count - 1 for count in keys.values() if count > 1)
+def count_possible_duplicates(transactions: list[dict[str, Any]], window_minutes: int = 24 * 60) -> int:
+    """Number of extra non-refunded charges with the same amount and description inside a short time window.
+
+    The window keeps regular renewals (the same "Pro monthly" charge every month) from counting as duplicates.
+    """
+    groups: dict[tuple[Any, Any], list[int]] = defaultdict(list)
+    for tx in transactions:
+        if tx["status"] in {"pending", "captured"}:
+            groups[(tx["amount"], tx["description"])].append(tx.get("minutes_ago", 0))
+
+    duplicates = 0
+    for times in groups.values():
+        times.sort()
+        duplicates += sum(1 for previous, current in zip(times, times[1:]) if current - previous <= window_minutes)
+    return duplicates

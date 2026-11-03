@@ -89,3 +89,20 @@ def test_registry_returns_errors_instead_of_raising(registry):
     for record in (unknown, bad_json, bad_args):
         assert record.is_error
         assert "error" in record.output
+
+
+def test_monthly_renewals_are_not_duplicates():
+    renewals = [
+        {"amount": 29.99, "description": "Pro monthly", "status": "captured", "minutes_ago": days * 24 * 60}
+        for days in (0, 30, 60)
+    ]
+    assert count_possible_duplicates(renewals) == 0
+
+
+def test_repeated_charges_within_a_day_are_duplicates():
+    retries = [
+        {"amount": 29.99, "description": "Pro monthly upgrade", "status": "pending", "minutes_ago": m}
+        for m in (182, 121, 75)
+    ]
+    old_renewal = {"amount": 29.99, "description": "Pro monthly upgrade", "status": "captured", "minutes_ago": 50000}
+    assert count_possible_duplicates(retries + [old_renewal]) == 2
